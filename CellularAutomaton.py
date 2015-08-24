@@ -67,12 +67,6 @@ def determine_next_time_step(previous_row, rule_number):
     previous_row -- The last created row of the automaton as a String.
     rule_number -- The rule number being used for the current automaton.
 
-<<<<<<< HEAD
-=======
-    Here, the rule number, input by the user will be used to produce the next
-    row of the automaton from the previous row.
-
->>>>>>> 3dd1233790e2bd209798a8b1d0ed141e0675615b
     Tests:
     >>> determine_next_time_step('00100', '00011110')
     '01110'
