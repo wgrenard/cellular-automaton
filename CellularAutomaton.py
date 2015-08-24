@@ -17,35 +17,6 @@ Example:
 
 import sys
 
-def convert_to_binary(decimal_num):
-    """Convert the input base 10 integer to binary."""
-
-    binary_num = ""
-
-    for digit in range(7, -1, -1):
-        if 2**digit > decimal_num:
-            binary_num += "0"
-        else:
-            binary_num += "1"
-            decimal_num -= 2**digit
-
-    return binary_num
-
-
-
-def convert_to_decimal(binary_string):
-    """Convert the input binary string to a base 10 integer."""
-
-    decimal_num = 0
-    index = 0
-
-    while index < len(binary_string):
-        decimal_num += (2**index)*int(binary_string[len(binary_string) - 1 - index])
-        index += 1
-
-    return decimal_num
-
-
 def create_first_row(num_of_timesteps):
     """Return the first row of the automaton in the form of a string.
 
@@ -69,19 +40,10 @@ def create_first_row(num_of_timesteps):
     '000000000010000000000'
     """
 
-    row_length = 2*(num_of_timesteps) + 1
-    row_one = ""
+    row_list = ['0']*num_of_timesteps + ['1'] + ['0']*num_of_timesteps
+    row_string = ''.join(row_list)
 
-    # Iterate once for each element that should be in the initial row. In the
-    # center of the row, place a '1'. Elsewhere, place '0's.
-    for element in range(row_length):
-        if element == (row_length - 1)/2:
-            row_one += "1"
-        else:
-            row_one += "0"
-
-    return row_one
-
+    return row_string
 
 
 def determine_next_time_step(previous_row, rule_number):
@@ -106,27 +68,19 @@ def determine_next_time_step(previous_row, rule_number):
     """
 
     new_row = ""
-    input_string = ""   # This will hold the 3-bit binary label
-    index = 0
 
-    # Loop through the previous row, and for each character in the string
-    # determine the input created from the current character and its two adjacent
-    # characters. Compare this input to the rule number, and place the appropriate
-    # character in the new string.
-    while index < len(previous_row):
-        if index == 0:
-            input_string = "0" + previous_row[index] + previous_row[index + 1]
+    # Add a 0 to the beginning and end of the row because all elements outside
+    # of the automaton should be 0's.
+    extended_row = '0' + previous_row + '0'
 
-        if index == len(previous_row) - 1:
-            input_string = previous_row[index - 1] + previous_row[index] + "0"
+    # Slice the extended row into three bit long binary strings
+    bin_list = [extended_row[i-1:i+2] for i in range(1, len(extended_row)-1)]
 
-        else:
-            input_string = previous_row[index - 1] + previous_row[index] + previous_row[index + 1]
-
-        input_decimal = convert_to_decimal(input_string)
-        new_row += rule_number[len(rule_number) - 1 - input_decimal]
-
-        index += 1
+    # For each binary string just created, convert to a decimal number. Retrieve
+    # the corresponding digit in the rule number and add this to the new row.
+    for bin_num in bin_list:
+        dec_num = int(bin_num, 2)
+        new_row += rule_number[len(rule_number) - dec_num - 1]
 
     return new_row
 
@@ -138,16 +92,18 @@ if __name__ == "__main__":
 TIME_STEP = 1
 BITMAP_WIDTH = 2*int(sys.argv[2]) + 1
 BITMAP_HEIGHT = int(sys.argv[2]) + 1
-BINARY_RULE = convert_to_binary(int(sys.argv[1]))
+BINARY_RULE = bin(int(sys.argv[1]))[2:]
 
-EVAL_ROW = create_first_row(int(sys.argv[2]))
+FIRST_ROW = create_first_row(int(sys.argv[2]))
 
+# Format the .pbm file by printing the first line in the form "P1 width height."
 print "P1 " + str(BITMAP_WIDTH) + " " + str(BITMAP_HEIGHT)
-print EVAL_ROW
+print FIRST_ROW
 
+# Create rows of the automaton
 while TIME_STEP <= int(sys.argv[2]):
-    NEXT_ROW = determine_next_time_step(EVAL_ROW, BINARY_RULE)
+    NEXT_ROW = determine_next_time_step(FIRST_ROW, BINARY_RULE)
     print NEXT_ROW
-    EVAL_ROW = NEXT_ROW
+    FIRST_ROW = NEXT_ROW
 
     TIME_STEP += 1
