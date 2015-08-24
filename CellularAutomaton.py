@@ -1,21 +1,35 @@
 """This program creates a cellular automaton, which can be viewed as a pbm file.
 
-When this program is run, two command line arguments must be given, separated
-by a space. The first specifies the rule number of the output. The second
-specifies the number of timesteps the automaton uses to create the output.
-The output is a printed 2 dimensional array of 0's and 1's. If this is saved
-as a .pbm file, these 0's and 1's will be corresponded to white and black
-cells, respectively.
-
-Example:
-    The following command line prompt will create a cellular automaton with
-    20 rows, using rule number 57, and will store the result as a file
-    named rule57.pbm.
-
-    python CellularAutomaton.py 57 20 > rule57.pbm
+The output is a printed 2 dimensional array of 0's and 1's, created based upon
+the rule number and number of time steps entered by the user. If the output is
+saved as a .pbm file, the 0's and 1's will be corresponded to white and black
+cells, respectively, in the file.
 """
 
-import sys
+def obtain_user_input():
+    """Obtain input from the user and check for input errors."""
+
+    while True:
+        try:
+            rule_number = int(raw_input("Enter a rule number from 0-255: "))
+
+            # If the input is outside of 0-255 then user needs to re-enter.
+            if rule_number < 0 or rule_number > 255:
+                raise ValueError()
+            break
+
+        except ValueError:
+            print "Not a valid input."
+
+    while True:
+        try:
+            num_of_timesteps = int(raw_input("Enter the number of timesteps to be used: "))
+            break
+        except ValueError:
+            print "Not a valid input."
+
+    return (rule_number, num_of_timesteps)
+
 
 def create_first_row(num_of_timesteps):
     """Return the first row of the automaton in the form of a string.
@@ -53,9 +67,6 @@ def determine_next_time_step(previous_row, rule_number):
     previous_row -- The last created row of the automaton as a String.
     rule_number -- The rule number being used for the current automaton.
 
-    Here, the rule number, input by the user in the command line will be used
-    to produce the next row of the automaton from the previous row.
-
     Tests:
     >>> determine_next_time_step('00100', '00011110')
     '01110'
@@ -77,7 +88,7 @@ def determine_next_time_step(previous_row, rule_number):
     bin_list = [extended_row[i-1:i+2] for i in range(1, len(extended_row)-1)]
 
     # For each binary string just created, convert to a decimal number. Retrieve
-    # the corresponding digit in the rule number and add this to the new row.
+    # the corresponding digit in the rule number and append this to the new row.
     for bin_num in bin_list:
         dec_num = int(bin_num, 2)
         new_row += rule_number[len(rule_number) - dec_num - 1]
@@ -90,18 +101,19 @@ if __name__ == "__main__":
 
 
 TIME_STEP = 1
-BITMAP_WIDTH = 2*int(sys.argv[2]) + 1
-BITMAP_HEIGHT = int(sys.argv[2]) + 1
-BINARY_RULE = bin(int(sys.argv[1]))[2:]
+(DECIMAL_RULE, NUM_OF_TIMESTEPS) = obtain_user_input()
+BITMAP_WIDTH = 2*NUM_OF_TIMESTEPS + 1
+BITMAP_HEIGHT = NUM_OF_TIMESTEPS + 1
+BINARY_RULE = bin(DECIMAL_RULE)[2:]
 
-FIRST_ROW = create_first_row(int(sys.argv[2]))
+FIRST_ROW = create_first_row(NUM_OF_TIMESTEPS)
 
 # Format the .pbm file by printing the first line in the form "P1 width height."
 print "P1 " + str(BITMAP_WIDTH) + " " + str(BITMAP_HEIGHT)
 print FIRST_ROW
 
 # Create rows of the automaton
-while TIME_STEP <= int(sys.argv[2]):
+while TIME_STEP <= NUM_OF_TIMESTEPS:
     NEXT_ROW = determine_next_time_step(FIRST_ROW, BINARY_RULE)
     print NEXT_ROW
     FIRST_ROW = NEXT_ROW
