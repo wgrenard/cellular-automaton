@@ -99,23 +99,22 @@ if __name__ == "__main__":
     import doctest
     doctest.testmod()
 
+    time_step = 1
+    (decimal_rule, num_of_timesteps) = obtain_user_input()
+    bitmap_width = 2*num_of_timesteps + 1
+    bitmap_height = num_of_timesteps + 1
+    binary_rule = bin(decimal_rule)[2:]
 
-TIME_STEP = 1
-(DECIMAL_RULE, NUM_OF_TIMESTEPS) = obtain_user_input()
-BITMAP_WIDTH = 2*NUM_OF_TIMESTEPS + 1
-BITMAP_HEIGHT = NUM_OF_TIMESTEPS + 1
-BINARY_RULE = bin(DECIMAL_RULE)[2:]
+    first_row = create_first_row(num_of_timesteps)
 
-FIRST_ROW = create_first_row(NUM_OF_TIMESTEPS)
+    # Format the .pbm file by printing the first line in the form "P1 width height."
+    print "P1 " + str(bitmap_width) + " " + str(bitmap_height)
+    print first_row
 
-# Format the .pbm file by printing the first line in the form "P1 width height."
-print "P1 " + str(BITMAP_WIDTH) + " " + str(BITMAP_HEIGHT)
-print FIRST_ROW
+    # Create rows of the automaton
+    while time_step <= num_of_timesteps:
+        next_row = determine_next_time_step(first_row, binary_rule)
+        print next_row
+        FIRST_ROW = next_row
 
-# Create rows of the automaton
-while TIME_STEP <= NUM_OF_TIMESTEPS:
-    NEXT_ROW = determine_next_time_step(FIRST_ROW, BINARY_RULE)
-    print NEXT_ROW
-    FIRST_ROW = NEXT_ROW
-
-    TIME_STEP += 1
+        time_step += 1
