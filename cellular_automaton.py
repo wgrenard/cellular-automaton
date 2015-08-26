@@ -7,6 +7,7 @@ cells, respectively, in the file.
 """
 
 def obtain_user_input():
+    #FIXME: specify what this function returns in the docstring
     """Obtain input from the user and check for input errors."""
 
     while True:
@@ -34,11 +35,11 @@ def obtain_user_input():
 def create_first_row(num_of_timesteps):
     """Return the first row of the automaton in the form of a string.
 
-    Arguments:
-    num_of_timesteps -- The number of timesteps to be used in creation of the automaton.
-
     This function will produce a string of length 2*num_of_timesteps + 1. The
     string contains all 0's except for a single 1 in the center.
+
+    Args:
+        num_of_timesteps -- The number of timesteps to be used in creation of the automaton.
 
     Tests:
     >>> create_first_row(1)
@@ -63,9 +64,9 @@ def create_first_row(num_of_timesteps):
 def determine_next_time_step(previous_row, rule_number):
     """Produce the next row of the automaton from the previous row.
 
-    Arguments:
-    previous_row -- The last created row of the automaton as a String.
-    rule_number -- The rule number being used for the current automaton.
+    Args:
+        previous_row -- The last created row of the automaton as a String.
+        rule_number -- The rule number being used for the current automaton.
 
     Tests:
     >>> determine_next_time_step('00100', '00011110')
@@ -95,10 +96,8 @@ def determine_next_time_step(previous_row, rule_number):
 
     return new_row
 
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
-
+def run_automaton():
+    """Run the cellular automaton program."""
     time_step = 1
     (decimal_rule, num_of_timesteps) = obtain_user_input()
     bitmap_width = 2*num_of_timesteps + 1
@@ -115,6 +114,14 @@ if __name__ == "__main__":
     while time_step <= num_of_timesteps:
         next_row = determine_next_time_step(first_row, binary_rule)
         print next_row
-        FIRST_ROW = next_row
+        first_row = next_row
 
         time_step += 1
+
+if __name__ == "__main__":
+    # FIXME: learn how to collect and run your doctests using the nosetests test
+    # instead of running them each time the module is run
+    import doctest
+    doctest.testmod()
+    run_automaton()
+
