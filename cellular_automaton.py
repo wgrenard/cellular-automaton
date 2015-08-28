@@ -7,8 +7,12 @@ cells, respectively, in the file.
 """
 
 def obtain_user_input():
-    #FIXME: specify what this function returns in the docstring
-    """Obtain input from the user and check for input errors."""
+    """Return a tuple containing the rule number and number of timesteps.
+
+    This function will obtain from the user the rule number and the number of
+    timesteps to be used in the creation of the automaton. It will check that
+    the input is valid, ensuring the rule number entered is an integer from
+    0-255 and that the number of timesteps is a positive integer."""
 
     while True:
         try:
@@ -25,7 +29,12 @@ def obtain_user_input():
     while True:
         try:
             num_of_timesteps = int(raw_input("Enter the number of timesteps to be used: "))
+
+            # If the input is 0 or negative, then the user needs to re-enter.
+            if num_of_timesteps <= 0:
+                raise ValueError()
             break
+
         except ValueError:
             print "Not a valid input."
 
@@ -98,6 +107,7 @@ def determine_next_time_step(previous_row, rule_number):
 
 def run_automaton():
     """Run the cellular automaton program."""
+
     time_step = 1
     (decimal_rule, num_of_timesteps) = obtain_user_input()
     bitmap_width = 2*num_of_timesteps + 1
@@ -119,9 +129,5 @@ def run_automaton():
         time_step += 1
 
 if __name__ == "__main__":
-    # FIXME: learn how to collect and run your doctests using the nosetests test
-    # instead of running them each time the module is run
-    import doctest
-    doctest.testmod()
     run_automaton()
 
