@@ -6,6 +6,9 @@ saved as a .pbm file, the 0's and 1's will be corresponded to white and black
 cells, respectively, in the file.
 """
 
+class NumberOutOfBoundsError(Exception):
+    pass
+
 def obtain_user_input():
     """Return a tuple containing the rule number and number of timesteps.
 
@@ -14,29 +17,19 @@ def obtain_user_input():
     the input is valid, ensuring the rule number entered is an integer from
     0-255 and that the number of timesteps is a positive integer."""
 
-    while True:
-        try:
-            rule_number = int(raw_input("Enter a rule number from 0-255: "))
+    rule_number = int(raw_input("Enter a rule number from 0-255: "))
 
-            # If the input is outside of 0-255 then user needs to re-enter.
-            if rule_number < 0 or rule_number > 255:
-                raise ValueError()
-            break
+    # If the input is outside of 0-255 then user needs to re-enter.
+    if rule_number < 0 or rule_number > 255:
+        raise NumberOutOfBoundsError("Input rule number {} is out of range "
+                                     "0-255.".format(rule_number))
 
-        except ValueError:
-            print "Not a valid input."
+    num_of_timesteps = int(raw_input("Enter the number of timesteps to be used: "))
 
-    while True:
-        try:
-            num_of_timesteps = int(raw_input("Enter the number of timesteps to be used: "))
-
-            # If the input is 0 or negative, then the user needs to re-enter.
-            if num_of_timesteps <= 0:
-                raise ValueError()
-            break
-
-        except ValueError:
-            print "Not a valid input."
+    # If the input is 0 or negative, then the user needs to re-enter.
+    if num_of_timesteps <= 0:
+        raise NumberOutOfBoundsError("Input time steps {} is less than "
+                                     "zero.".format(num_of_timesteps))
 
     return (rule_number, num_of_timesteps)
 
@@ -109,7 +102,15 @@ def run_automaton():
     """Run the cellular automaton program."""
 
     time_step = 1
-    (decimal_rule, num_of_timesteps) = obtain_user_input()
+
+    while True:
+        try:
+            (decimal_rule, num_of_timesteps) = obtain_user_input()
+            break
+        except Exception as err:
+            print err
+            continue
+
     bitmap_width = 2*num_of_timesteps + 1
     bitmap_height = num_of_timesteps + 1
     binary_rule = bin(decimal_rule)[2:]
